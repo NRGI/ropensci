@@ -1,68 +1,129 @@
 ## Start with the rstudio image providing 'base R' as well as RStudio based on Debian testing
-FROM rocker/hadleyverse
+## Published on DockerHub as cboettig/ropensci:dev 
+FROM rocker/ropensci:latest 
+
 MAINTAINER Carl Boettiger cboettig@ropensci.org
 
-## Refresh package list and upgrade
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends -t unstable \
-    cdbs \
-    gdal-bin \
-    libgdal1-dev \
-    icedtea-netx \
-    libxslt1-dev \
-    libgeos-dev \
-    libgeos-c1v5 \
-    libgl1-mesa-dev \
-    libhiredis-dev \
-    libproj-dev \
-    librdf0-dev \
-    libsasl2-dev \
-    libv8-dev \
-    netcdf-bin \
-    python-pip 
-
-
-## Install additional dependencies
-RUN rm -rf /tmp/*.rds \
-  && install2.r --error \
-    -r http://cran.rstudio.com \
-    -r http://datacube.wu.ac.at \
-    -r http://packages.ropensci.org \
-    dismo \
-    geiger \
+## Github-dev versions of the R packages already on CRAN
+## Non-alphabetized since order reflects package dependencies
+RUN install2.r -r http://cran.rstudio.com -r http://packages.ropensci.org \ 
+    AntWeb \
+    aRxiv \
+    binomen \
+    bmc \
+    bold \
+    cartographer \
+    chromer \
+    ckanr \
+    clifro \
+    csl \
+    dashboard \
+    datapackage \
+    dependencies \
+    dvn \
+    ecoengine \
+    ecoretriever \
+    elastic \
+    elasticdsl \
+    EML \
+    etseed \
+    finch \
+    floras \
+    fulltext \
+    gender \
+    genderdata \
+    geojsonio \
+    geonames \
+    ggit \
+    gigadb \
+    gistr \
     git2r \
-    knitcitations \
-    pander \
-    phylobase \
-    phytools \
-    Rcampdf \
-    drat \
-    ropkgs \
-    ridigbio \
-    rgeolocate \
-    RJSONIO \
-  && installGithub.r \
-    richfitz/drat.builder \
-    cloudyr/aws.signature \
-    cloudyr/aws.s3 \
-    egonw/rrdf/rrdflibs \
-    egonw/rrdf/rrdf \
-  && Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("rhdf5", ask=FALSE); biocLite("sangerseqR", ask=FALSE)' \
-  && pip install retriever \
-  && rm -rf /tmp/downloaded_packages/ /tmp/*.rds 
+    gitr \
+    hathi \
+    historydata \
+    ICES \
+    IEEER \
+    internetarchive \
+    jqr \
+    lawn \
+    mdextract \
+    mocker \
+    musemeta \
+    neotoma \
+    nodbi \
+    opencontext \
+    ots \
+    paleobioDB \
+    pangaear \
+    parasiteR \
+    pleiades \
+    plotly \
+    prism \
+    proj \
+    rAltmetric \
+    rAvis \
+    rbefdata \
+    rbhl \
+    rbison \
+    rchie \
+    rcrossref \
+    RCryptsy \
+    rDat \
+    rdatacite \
+    rdataone \
+    rdopa \
+    rdpla \
+    rdryad \
+    rebi \
+    rebird \
+    RedisAPI \
+    redland-bindings \
+    rentrez \
+    reol \
+    rerddap \
+    reuropeana \
+    rfigshare \
+    rfishbase \
+    rfisheries \
+    rgauges \
+    rgbif \
+    rGEM \
+    rglobi \
+    rgpdd \
+    rif \
+    rinat \
+    RMendeley \
+    rmetadata \
+    RMETAR \
+    rnbn \
+    RNeXML \
+    rnoaa \
+    rnpn \
+    rOBIS \
+    rorcid \
+    rplos \
+    rpwt \
+    rrdf \
+    rrlite \
+    RSelenium \
+    rsnps \
+    RStars \
+    rWBclimate \
+    sheetseeR \
+    sofa \
+    solr \
+    spocc \
+    taxize \
+    taxizesoap \
+    testdat \
+    traits \
+    treeBASE \
+    ucipp \
+    USAboundaries \
+    webchem \
+    webmockr \
+    wellknown \
+    zenodo \
+  && R -e "update.packages(ask=FALSE, repo=c('http://packages.ropensci.org', 'http://cran.rstudio.com'))" \
+  && rm -rf /tmp/downloaded_packages/
 
-RUN install2.r --error \
-    -r http://cran.rstudio.com \
-    -r http://www.omegahat.org/R \
-    -r http://packages.ropensci.org \
-    Rcompression \
-    RHTMLForms \
-    ROOXML \
-    RWordXML \
-    SSOAP \
-    Sxslt \
-    XMLSchema 
-
-## Install the rOpenSci R packages that are currently on CRAN. must use single quote notation
-RUN R -e 'out <- ropkgs::ro_pkgs(); install.packages(out$packages$name[out$packages$on_cran])' \
-  && rm -rf /tmp/downloaded_packages/ /tmp/*.rds
